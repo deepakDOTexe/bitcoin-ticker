@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'coin_data.dart';
 import 'dart:io' show Platform;
-import 'dart:convert';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -11,7 +10,8 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
 
-  String selectedCurrency = 'USD';
+  String selectedCurrency = currenciesList[0];
+  String exchangeRate = '?';
 
   DropdownButton<String> androidDropDown(){
     List<DropdownMenuItem<String>> dropDownList = [];
@@ -29,6 +29,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value){
         setState(() {
           selectedCurrency = value;
+          getExchangeRate();
         });
       },
     );
@@ -47,30 +48,31 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];
+          getExchangeRate();
+        });
       },
       children: itemList,
     );
   }
+
   @override
   void initState() {
     super.initState();
     getExchangeRate();
   }
 
-  String exchangeRate = '?';
-
   void getExchangeRate() async {
     try{
       CoinData coinData = CoinData();
-      double rateOfCoin = await coinData.getCoinData();
+      double rateOfCoin = await coinData.getCoinData(selectedCurrency);
       setState(() {
         exchangeRate = rateOfCoin.toStringAsFixed(0);
       });
     } catch(e){
       print(e);
     }
-
   }
 
   @override
@@ -94,7 +96,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $exchangeRate USD',
+                  '1 BTC = $exchangeRate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,

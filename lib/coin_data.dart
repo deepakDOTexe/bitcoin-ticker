@@ -37,8 +37,8 @@ const coinURL = 'https://rest.coinapi.io/v1/exchangerate';
 
 class CoinData {
 
-  Future getCoinData() async{
-    String url = '$coinURL/BTC/USD?apikey=$apiKey';
+  Future getCoinData(String currency) async{
+    String url = '$coinURL/BTC/$currency?apikey=$apiKey';
     http.Response response =  await http.get(url);
     if(response.statusCode == 200){
       double exchangeRate = jsonDecode(response.body)['rate'];
