@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'coin_data.dart';
 import 'dart:io' show Platform;
+import 'dart:convert';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -51,6 +52,26 @@ class _PriceScreenState extends State<PriceScreen> {
       children: itemList,
     );
   }
+  @override
+  void initState() {
+    super.initState();
+    getExchangeRate();
+  }
+
+  String exchangeRate = '?';
+
+  void getExchangeRate() async {
+    try{
+      CoinData coinData = CoinData();
+      double rateOfCoin = await coinData.getCoinData();
+      setState(() {
+        exchangeRate = rateOfCoin.toStringAsFixed(0);
+      });
+    } catch(e){
+      print(e);
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +94,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $exchangeRate USD',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
